@@ -1,3 +1,4 @@
+//#define T2K_USE_GENIE
 
 #ifndef T2KDATAFRAME
 #define T2KDATAFRAME
@@ -13,6 +14,7 @@ using namespace std;
 #include "ND__TTruthTrajectoriesModule.h"
 #include "ND__TTruthVerticesModule.h"
 #include "ND__GRooTrackerVtx.h"
+#include "ND__NRooTrackerVtx.h"
 
 #include <memory>
 #include <map>
@@ -26,7 +28,11 @@ namespace T2K {
     using TruthTrajVec = ROOT::VecOps::RVec<TruthTraj *>;
     using TruthVtx = ND::TTruthVerticesModule::TTruthVertex;
     using TruthVtxVec = ROOT::VecOps::RVec<TruthVtx *>;
+#ifdef T2K_USE_GENIE
     using TruthRooVtx = ND::GRooTrackerVtx;
+#else
+    using TruthRooVtx = ND::NRooTrackerVtx;
+#endif
     using TruthRooVtxVec = ROOT::VecOps::RVec<TruthRooVtx *>;
 
     class MyRRootDS final : public ROOT::RDF::RDataSource {
@@ -333,7 +339,11 @@ namespace T2K {
                                                                                       "HeaderDir/BasicDataQuality",
                                                                                       "HeaderDir/BeamSummaryData",
                                                                                       "ReconDir/Global",
+#ifdef T2K_USE_GENIE
                                                                                       "TruthDir/GRooTrackerVtx",
+#else
+                                                                                      "TruthDir/NRooTrackerVtx",
+#endif
                                                                                       "TruthDir/Trajectories",
                                                                                       "TruthDir/Vertices",
                                                 },

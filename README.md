@@ -14,6 +14,8 @@ cmake -DMAKE_PROJECT_FILE_NAME=<path_to_an_oaanalysis_file.root> /path/to/t2kdat
 ```
 An oaAnalysis file is needed to generate the oaAnalysis headers using ROOT TFile::MakeProject.
 
+A preprocessor flag `T2K_USE_GENIE` can be set to compile for GENIE input MC rather than NEUT.
+
 ## Usage
 
 To read a set of files use `T2K::MakeT2KDataFrame`. This takes a list of input files, a boolean flag asking whether to
