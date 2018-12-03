@@ -1,6 +1,6 @@
 ## T2KDataFrame
 
-Provides an custom datasource for [RDataFrame](https://root.cern/doc/master/classROOT_1_1RDataFrame.html) to read T2K ND280 near detector analysis files. More information is provided in the talk at [T2K December 2018 software meeting](https://t2k.org/nd280/software/meetings/2018Meetings/swreconMeet3Dec2018/t2kdataframe).
+Provides an custom data source for [RDataFrame](https://root.cern/doc/master/classROOT_1_1RDataFrame.html) to read T2K ND280 near detector analysis files. More information is provided in the talk at the [T2K December 2018 software meeting](https://t2k.org/nd280/software/meetings/2018Meetings/swreconMeet3Dec2018/t2kdataframe).
 
 ## Compilation
 
@@ -8,13 +8,12 @@ A cmake configuration is provided to compile to a standalone library. Alternativ
 `T2KDataSource.cxx` and `T2KDataSource.hxx` which can simply be pasted directly into an existing project.
 The only dependencies are ROOT and oaAnalysis headers (which the CMake compilation will automatically generate).
 
-To compile
+To compile run:
 ```
 cmake -DMAKE_PROJECT_FILE_NAME=<path_to_an_oaanalysis_file.root> /path/to/t2kdataframe
+make
 ```
-An oaAnalysis file is needed to generate the oaAnalysis headers using ROOTs [TFile::MakeProject](https://root.cern/doc/master/classROOT_1_1RDataFrame.html).
-
-A preprocessor flag `T2K_USE_GENIE` can be set in `T2KDataSource.hxx` compile for GENIE input MC rather than NEUT.
+An oaAnalysis file is needed to generate the oaAnalysis headers using ROOTs [TFile::MakeProject](https://root.cern/doc/master/classROOT_1_1RDataFrame.html). A preprocessor flag `T2K_USE_GENIE` can be set in `T2KDataSource.hxx` to compile for GENIE input MC rather than NEUT.
 
 ## Usage
 
