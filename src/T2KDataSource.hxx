@@ -35,7 +35,7 @@ namespace T2K {
 #endif
     using TruthRooVtxVec = ROOT::VecOps::RVec<TruthRooVtx *>;
 
-    class MyRRootDS final : public ROOT::RDF::RDataSource {
+    class T2KSingleRootChainDS final : public ROOT::RDF::RDataSource {
     private:
         unsigned int fNSlots = 0U;
         std::vector<ULong64_t> slotcurrententry;
@@ -51,8 +51,8 @@ namespace T2K {
         std::vector<void *> GetColumnReadersImpl(std::string_view, const std::type_info &);
         ULong64_t GetEntries() { return fModelChain.GetEntries(); }
     public:
-        MyRRootDS(std::string_view treeName, std::vector<std::string> fileNameGlob);
-        ~MyRRootDS();
+        T2KSingleRootChainDS(std::string_view treeName, std::vector<std::string> fileNameGlob);
+        ~T2KSingleRootChainDS();
         std::string GetTypeName(std::string_view colName) const;
         const std::vector<std::string> &GetColumnNames() const;
         bool HasColumn(std::string_view colName) const;
@@ -74,7 +74,7 @@ namespace T2K {
         std::vector<std::string> treenames;
         ULong64_t processed;
         int nbunches;
-        std::vector<unique_ptr<T2K::MyRRootDS> > _chainreaders;
+        std::vector<unique_ptr<T2K::T2KSingleRootChainDS> > _chainreaders;
         mutable std::map<std::string, int> _columnnamemap;
 
     public:
