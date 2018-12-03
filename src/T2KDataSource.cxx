@@ -10,7 +10,7 @@
 
 namespace T2K {
 
-    std::vector<void *> T2KSingleRootChainDS::GetColumnReadersImpl(std::string_view name, const std::type_info &id) {
+    std::vector<void *> T2KDataSource::T2KSingleRootChainDS::GetColumnReadersImpl(std::string_view name, const std::type_info &id) {
         const auto colTypeName = GetTypeName(name);
         const auto &colTypeId = ROOT::Internal::RDF::TypeName2TypeID(colTypeName);
         if (id != colTypeId) {
@@ -31,7 +31,7 @@ namespace T2K {
         return ret;
     }
 
-    T2KSingleRootChainDS::T2KSingleRootChainDS(std::string_view treeName, std::vector<std::string> fileNameGlob)
+    T2KDataSource::T2KSingleRootChainDS::T2KSingleRootChainDS(std::string_view treeName, std::vector<std::string> fileNameGlob)
             : fTreeName(treeName), fFileNameGlob(fileNameGlob), fModelChain(std::string(treeName).c_str()) {
         for (auto &f : fFileNameGlob) { fModelChain.Add(f.c_str()); }
 
@@ -51,13 +51,13 @@ namespace T2K {
         }
     }
 
-    T2KSingleRootChainDS::~T2KSingleRootChainDS() {
+    T2KDataSource::T2KSingleRootChainDS::~T2KSingleRootChainDS() {
         for (auto addr : fAddressesToFree) {
             delete addr;
         }
     }
 
-    std::string T2KSingleRootChainDS::GetTypeName(std::string_view colName) const {
+    std::string T2KDataSource::T2KSingleRootChainDS::GetTypeName(std::string_view colName) const {
         if (!HasColumn(colName)) {
             std::string e = "The dataset does not have column ";
             e += colName;
@@ -74,17 +74,17 @@ namespace T2K {
         return typeName;
     }
 
-    const std::vector<std::string> &T2KSingleRootChainDS::GetColumnNames() const {
+    const std::vector<std::string> &T2KDataSource::T2KSingleRootChainDS::GetColumnNames() const {
         return fListOfBranches;
     }
 
-    bool T2KSingleRootChainDS::HasColumn(std::string_view colName) const {
+    bool T2KDataSource::T2KSingleRootChainDS::HasColumn(std::string_view colName) const {
         if (!fListOfBranches.empty())
             GetColumnNames();
         return fListOfBranches.end() != std::find(fListOfBranches.begin(), fListOfBranches.end(), colName);
     }
 
-    void T2KSingleRootChainDS::InitSlot(unsigned int slot, ULong64_t firstEntry) {
+    void T2KDataSource::T2KSingleRootChainDS::InitSlot(unsigned int slot, ULong64_t firstEntry) {
         auto chain = new TChain(fTreeName.c_str());
         chain->ResetBit(kMustCleanup);
         for (auto &f : fFileNameGlob) { chain->Add(f.c_str()); }
@@ -114,7 +114,7 @@ namespace T2K {
 
     }
 
-    void T2KSingleRootChainDS::FinaliseSlot(unsigned int slot) {
+    void T2KDataSource::T2KSingleRootChainDS::FinaliseSlot(unsigned int slot) {
 #ifdef T2K_DEBUG_PERFORMANCE
         fChains[slot]->GetTree()->PrintCacheStats();
 #endif
@@ -122,12 +122,12 @@ namespace T2K {
 
     }
 
-    std::vector<std::pair<ULong64_t, ULong64_t>> T2KSingleRootChainDS::GetEntryRanges() {
+    std::vector<std::pair<ULong64_t, ULong64_t>> T2KDataSource::T2KSingleRootChainDS::GetEntryRanges() {
         auto entryRanges(std::move(fEntryRanges)); // empty fEntryRanges
         return entryRanges;
     }
 
-    bool T2KSingleRootChainDS::SetEntry(unsigned int slot, ULong64_t entry) {
+    bool T2KDataSource::T2KSingleRootChainDS::SetEntry(unsigned int slot, ULong64_t entry) {
         if (entry != slotcurrententry[slot]) {
             fChains[slot]->GetEntry(entry);
             slotcurrententry[slot] = entry;
@@ -135,7 +135,7 @@ namespace T2K {
         return true;
     }
 
-    void T2KSingleRootChainDS::SetNSlots(unsigned int nSlots) {
+    void T2KDataSource::T2KSingleRootChainDS::SetNSlots(unsigned int nSlots) {
         assert(0U == fNSlots && "Setting the number of slots even if the number of slots is different from zero.");
 
         fNSlots = nSlots;
@@ -147,7 +147,7 @@ namespace T2K {
         fChains.resize(fNSlots);
     }
 
-    void T2KSingleRootChainDS::Initialise() {
+    void T2KDataSource::T2KSingleRootChainDS::Initialise() {
         const auto nentries = fModelChain.GetEntries();
         const auto chunkSize = nentries / fNSlots;
         const auto reminder = 1U == fNSlots ? 0 : nentries % fNSlots;
@@ -160,11 +160,6 @@ namespace T2K {
             (void) i;
         }
         fEntryRanges.back().second += reminder;
-    }
-
-    ROOT::RDataFrame MakeRootDataFrame(std::string_view treeName, std::vector<std::string> fileNameGlob) {
-        ROOT::RDataFrame tdf(std::make_unique<T2KSingleRootChainDS>(treeName, fileNameGlob));
-        return tdf;
     }
 
     T2KDataFrameWrapper MakeT2KDataFrame(std::vector<std::string> fileNameGlob,
@@ -232,7 +227,7 @@ namespace T2K {
             treenames(treenames_),
             processed(0), nbunches(nbunches_) {
         for (auto &tn : treenames) {
-            _chainreaders.push_back(make_unique<T2K::T2KSingleRootChainDS>(tn, filename));
+            _chainreaders.push_back(make_unique<T2K::T2KDataSource::T2KSingleRootChainDS>(tn, filename));
         }
     }
 

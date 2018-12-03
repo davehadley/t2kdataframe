@@ -35,46 +35,45 @@ namespace T2K {
 #endif
     using TruthRooVtxVec = ROOT::VecOps::RVec<TruthRooVtx *>;
 
-    class T2KSingleRootChainDS final : public ROOT::RDF::RDataSource {
-    private:
-        unsigned int fNSlots = 0U;
-        std::vector<ULong64_t> slotcurrententry;
-        std::string fTreeName;
-        std::vector<std::string> fFileNameGlob;
-        mutable TChain fModelChain; // Mutable needed for getting the column type name
-        std::vector<double *> fAddressesToFree;
-        std::vector<std::string> fListOfBranches;
-        std::vector<std::pair<ULong64_t, ULong64_t>> fEntryRanges;
-        std::vector<std::vector<void *>> fBranchAddresses; // first container-> slot, second -> column;
-        std::vector<std::unique_ptr<TChain>> fChains;
-    public:
-        std::vector<void *> GetColumnReadersImpl(std::string_view, const std::type_info &);
-        ULong64_t GetEntries() { return fModelChain.GetEntries(); }
-    public:
-        T2KSingleRootChainDS(std::string_view treeName, std::vector<std::string> fileNameGlob);
-        ~T2KSingleRootChainDS();
-        std::string GetTypeName(std::string_view colName) const;
-        const std::vector<std::string> &GetColumnNames() const;
-        bool HasColumn(std::string_view colName) const;
-        void InitSlot(unsigned int slot, ULong64_t firstEntry);
-        void FinaliseSlot(unsigned int slot);
-        std::vector<std::pair<ULong64_t, ULong64_t>> GetEntryRanges();
-        bool SetEntry(unsigned int slot, ULong64_t entry);
-        void SetNSlots(unsigned int nSlots);
-        void Initialise();
-        TChain &GetSlotChain(int slot) { return *(fChains.at(slot)); }
-    };
-
-    ROOT::RDataFrame MakeRootDataFrame(std::string_view treeName, std::vector<std::string> fileNameGlob);
-
     class T2KDataSource final : public ROOT::RDF::RDataSource {
-    private:
+    public:
+
+        class T2KSingleRootChainDS final : public ROOT::RDF::RDataSource {
+        private:
+            unsigned int fNSlots = 0U;
+            std::vector<ULong64_t> slotcurrententry;
+            std::string fTreeName;
+            std::vector<std::string> fFileNameGlob;
+            mutable TChain fModelChain; // Mutable needed for getting the column type name
+            std::vector<double *> fAddressesToFree;
+            std::vector<std::string> fListOfBranches;
+            std::vector<std::pair<ULong64_t, ULong64_t>> fEntryRanges;
+            std::vector<std::vector<void *>> fBranchAddresses; // first container-> slot, second -> column;
+            std::vector<std::unique_ptr<TChain>> fChains;
+        public:
+            std::vector<void *> GetColumnReadersImpl(std::string_view, const std::type_info &);
+            ULong64_t GetEntries() { return fModelChain.GetEntries(); }
+        public:
+            T2KSingleRootChainDS(std::string_view treeName, std::vector<std::string> fileNameGlob);
+            ~T2KSingleRootChainDS();
+            std::string GetTypeName(std::string_view colName) const;
+            const std::vector<std::string> &GetColumnNames() const;
+            bool HasColumn(std::string_view colName) const;
+            void InitSlot(unsigned int slot, ULong64_t firstEntry);
+            void FinaliseSlot(unsigned int slot);
+            std::vector<std::pair<ULong64_t, ULong64_t>> GetEntryRanges();
+            bool SetEntry(unsigned int slot, ULong64_t entry);
+            void SetNSlots(unsigned int nSlots);
+            void Initialise();
+            TChain &GetSlotChain(int slot) { return *(fChains.at(slot)); }
+        };
+
         int _nslots;
         mutable std::vector<std::string> columnnames;
         std::vector<std::string> treenames;
         ULong64_t processed;
         int nbunches;
-        std::vector<unique_ptr<T2K::T2KSingleRootChainDS> > _chainreaders;
+        std::vector<unique_ptr<T2K::T2KDataSource::T2KSingleRootChainDS> > _chainreaders;
         mutable std::map<std::string, int> _columnnamemap;
 
     public:
