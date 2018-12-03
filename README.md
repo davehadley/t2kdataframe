@@ -24,4 +24,14 @@ of trees to load (commonly used trees are loaded by default).
 
 See `example.cxx` and `example.py` for working examples.
 
+## Predefined Columns
+
+All branches in the loaded trees have columns with the name `<Tree Name>_<Branch Name>`. For example, global reconstructed objects are called `Global_PIDs`.
+
+MakeT2KDataFrame predefines some additional columns for convenience. These include:
+
+* `t2kreco` a list of all global reconstructed tracks in time with the current bunch.
+* `t2kbunch` an integer with the current bunch number (typically 0 to 8).
+* `t2ktruthtraj`, `t2ktruthvtx` and `t2kroovtx` contain lists of all truth vertices/trajectories in the spill. For data these will be empty containers.
+
 Contact <d.r.hadley@warwick.ac.uk> if you have any questions.
