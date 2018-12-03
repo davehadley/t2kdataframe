@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     bool enabletruth = std::string(argv[1])!="0";
     // Other arguments are a list of files to process
     std::vector<std::string> filelist;
-    for (int i = 3; i < argc; ++i) {
+    for (int i = 2; i < argc; ++i) {
         filelist.emplace_back(argv[i]);
     }
 
