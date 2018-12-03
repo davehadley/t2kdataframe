@@ -1,6 +1,6 @@
 ## T2KDataFrame
 
-Provides an custom datasource for [RDataFrame](https://root.cern/doc/master/classROOT_1_1RDataFrame.html) to read T2K ND280 near detector analysis files.
+Provides an custom datasource for [RDataFrame](https://root.cern/doc/master/classROOT_1_1RDataFrame.html) to read T2K ND280 near detector analysis files. More information is provided in the talk at [T2K December 2018 software meeting](https://t2k.org/nd280/software/meetings/2018Meetings/swreconMeet3Dec2018/t2kdataframe).
 
 ## Compilation
 
