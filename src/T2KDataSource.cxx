@@ -197,7 +197,12 @@ namespace T2K {
                 .Define("t2kisnewfile", [datasourceptr, nbunches](unsigned int slot, ULong64_t entry, int t2kbunch) { return datasourceptr->GetSlotChain(slot, 0).GetChainEntryNumber(0)==(entry/nbunches) && t2kbunch==0; }, {"tdfslot_", "tdfentry_", "t2kbunch"} );
         if(enabletruth) {
             //Add Truth vertices
-            reco = reco.Define("t2kroovtx", T2K::tcatorvec<ND::GRooTrackerVtx*>, {"GRooTrackerVtx_Vtx"})
+            reco =
+#ifdef T2K_USE_GENIE
+                    reco.Define("t2kroovtx", T2K::tcatorvec<ND::GRooTrackerVtx*>, {"GRooTrackerVtx_Vtx"})
+#else
+                    reco.Define("t2kroovtx", T2K::tcatorvec<ND::GRooTrackerVtx*>, {"NRooTrackerVtx_Vtx"})
+#endif
                     .Define("t2ktruthtraj", T2K::tcatorvec<TruthTraj*>, {"Trajectories_Trajectories"})
                     .Define("t2ktruthvtx", T2K::tcatorvec<TruthVtx*>, {"Vertices_Vertices"});
         }
