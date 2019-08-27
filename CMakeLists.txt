@@ -51,6 +51,16 @@ add_executable(examplet2kdataframe src/example.cxx)
 add_dependencies(examplet2kdataframe CustomMakeProjectTarget)
 target_link_libraries(examplet2kdataframe T2KDataSource ${MakeProjectLib} ${ROOT_LIBRARIES} )
 
+set(EXAMPLE_SCRIPTS example.py)
+
+foreach(_script ${EXAMPLE_SCRIPTS})
+  configure_file(
+          ${T2KDATAFRAME_SOURCE_DIR}/${_script}
+          ${T2KDATAFRAME_BINARY_DIR}/${_script}
+          COPYONLY
+  )
+endforeach()
+
 # Copy results to installation directory
 install (FILES ${MakeProjectLib} DESTINATION lib)
 install (TARGETS examplet2kdataframe DESTINATION bin)
