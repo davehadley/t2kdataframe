@@ -64,6 +64,11 @@ foreach(_script ${EXAMPLE_SCRIPTS})
 endforeach()
 
 # Copy results to installation directory
-install (FILES ${MakeProjectLib} DESTINATION lib)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameMakeProject/libT2KDataFrameMakeProjectProjectDict_rdict.pcm DESTINATION pyt2k)
+install (FILES ${MakeProjectLib} DESTINATION pyt2k)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameDict_rdict.pcm DESTINATION pyt2k)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameDict.rootmap DESTINATION pyt2k)
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameMakeProject.so DESTINATION pyt2k)
+install (TARGETS T2KDataSource DESTINATION pyt2k)
 install (TARGETS examplet2kdataframe DESTINATION bin)
 install (FILES t2kdataframe/T2KDataSource.hxx DESTINATION include/t2kdataframe)
