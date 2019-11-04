@@ -1,0 +1,20 @@
+from skbuild import setup
+setup(name="pyt2k",
+      version="0.1.0",
+      description="T2K python analysis code.",
+      author="D R Hadley",
+      author_email="d.r.hadley@warwick.ac.uk",
+      url="https://davehadley.github.io",
+      packages=["pyt2k"],
+      install_requires=["numpy", "matplotlib>=2.2.3, <3.0.0", "tabulate", "scipy", "iminuit",],
+      classifiers=[
+      "Development Status :: 1 - Planning",
+      "Environment :: Console",
+      "Intended Audience :: Science/Research",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python",
+      "Programming Language :: C++",
+      "Topic :: Scientific/Engineering :: Physics",
+      ],
+      )

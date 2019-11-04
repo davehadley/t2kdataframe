@@ -1,4 +1,4 @@
-#include <T2KDataSource.hxx>
+#include <t2kdataframe/T2KDataSource.hxx>
 #include <ROOT/TSeq.hxx>
 #include <TClass.h>
 #include <TROOT.h>         // For the gROOTMutex

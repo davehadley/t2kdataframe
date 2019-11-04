@@ -33,4 +33,33 @@ MakeT2KDataFrame predefines some additional columns for convenience. These inclu
 * `t2kbunch` an integer with the current bunch number (typically 0 to 8).
 * `t2ktruthtraj`, `t2ktruthvtx` and `t2kroovtx` contain lists of all truth vertices/trajectories in the spill. For data these will be empty containers.
 
+## Usage with pyroot
+
+An example package demonstrating the use with pyroot is also provided.
+
+First setup a virtual environment and install external dependencies:
+```
+# create a virtual environment
+virtualenv --no-site-packages env # this line only needs to be done once when you first setup the package
+source env/bin/activate
+# install dependencies
+pip install scikit-build
+pip install -r requirements.txt
+```
+
+Building requires an oaAnalysis file (in order to run TFile::MakeProject). To build run:
+```
+python setup.py build -- -DMAKE_PROJECT_FILE_NAME=path_to_oaanalysis_file.root
+```
+
+If you just want to run the code, and not make any changes you can go ahead and install it with:
+```
+python setup.py install
+```
+
+However, you *probably* want to actually make changes so you can run in development mode:
+```
+python setup.py develop
+```
+
 Contact <d.r.hadley@warwick.ac.uk> if you have any questions.
