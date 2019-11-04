@@ -212,8 +212,7 @@ namespace T2K {
     T2KDataFrameWrapper MakeT2KDataFrame(std::vector<std::string> fileNameGlob,
                                          bool enabletruth,
                                          std::vector<std::string> treeNames,
-                                         BunchTiming bunchTiming,
-                                         bool truthisgenie
+                                         BunchTiming bunchTiming
                                          ) {
         if(!enabletruth) {
             // Remove truth trees
@@ -221,6 +220,7 @@ namespace T2K {
             std::copy_if(treeNames.begin(), treeNames.end(), std::back_inserter(t), [](std::string& s){ return s.find("TruthDir")==std::string::npos; });
             treeNames = t;
         }
+        bool truthisgenie = any_of(treeNames.begin(), treeNames.end(), [](std::string& s){ return s.find("GRooTrackerVtx")!=std::string::npos; });
         // Create RDataFrame
         auto nbunches = bunchTiming.size();
         auto datasource = std::make_unique<T2KDataSource>(treeNames, fileNameGlob, nbunches);

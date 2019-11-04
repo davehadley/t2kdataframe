@@ -217,13 +217,11 @@ namespace T2K {
                                                                                "HeaderDir/BasicDataQuality",
                                                                                "HeaderDir/BeamSummaryData",
                                                                                "ReconDir/Global",
-                                                                               "TruthDir/GRooTrackerVtx",
                                                                                "TruthDir/NRooTrackerVtx",
                                                                                "TruthDir/Trajectories",
-                                                                               "TruthDir/Vertices",
+                                                                               "TruthDir/Vertices"
                                          },
-                                         BunchTiming bunchTiming = {},
-                                         bool truthisgenie = false
+                                         BunchTiming bunchTiming = {}
                                          );
 }
 #endif
