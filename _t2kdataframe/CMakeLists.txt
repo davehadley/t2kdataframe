@@ -28,10 +28,10 @@ endif()
 message(STATUS "using MAKE_PROJECT_FILE_NAME=${MAKE_PROJECT_FILE_NAME}")
 
 # Run ROOT's TFile::MakeProject
-set(MakeProjectLib ${T2KDATAFRAME_BINARY_DIR}/libT2KDataFrameMakeProject.so)
+set(MakeProjectLib ${T2KDATAFRAME_BINARY_DIR}/libT2KDataFrameMakeProject/libT2KDataFrameMakeProjectProjectSource.o)
 add_custom_command(
         OUTPUT ${MakeProjectLib}
-        COMMAND $ENV{ROOTSYS}/bin/root -l -q ${MAKE_PROJECT_FILE_NAME} ${T2KDATAFRAME_SOURCE_DIR}/t2kdataframe/buildmakeproject.C && mv ${T2KDATAFRAME_BINARY_DIR}/libT2KDataFrameMakeProject/*.so ./
+        COMMAND $ENV{ROOTSYS}/bin/root -l -q ${MAKE_PROJECT_FILE_NAME} ${T2KDATAFRAME_SOURCE_DIR}/t2kdataframe/buildmakeproject.C
         DEPENDS ${MAKE_PROJECT_FILE_NAME}
 )
 add_custom_target(CustomMakeProjectTarget DEPENDS ${MakeProjectLib})
@@ -44,14 +44,15 @@ include_directories("${T2KDATAFRAME_SOURCE_DIR}")
 # Generate library to use NCFGD code in python
 ROOT_GENERATE_DICTIONARY(T2KDataFrameDict t2kdataframe/T2KDataSource.hxx OPTIONS -inlineInputHeader LINKDEF t2kdataframe/T2KDataSourceLinkDef.h DEPENDENCIES CustomMakeProjectTarget)
 add_dependencies(T2KDataFrameDict CustomMakeProjectTarget)
-add_library(T2KDataSource SHARED t2kdataframe/T2KDataSource.cxx ${MakeProjectLib} T2KDataFrameDict.cxx)
+add_library(T2KDataSource SHARED t2kdataframe/T2KDataSource.cxx T2KDataFrameDict.cxx)
 add_dependencies(T2KDataSource CustomMakeProjectTarget)
+add_dependencies(T2KDataSource T2KDataFrameDict)
 target_link_libraries(T2KDataSource ${MakeProjectLib} ${ROOT_LIBRARIES})
 
 # Compile the main executable
 add_executable(examplet2kdataframe t2kdataframe/example.cxx)
 add_dependencies(examplet2kdataframe CustomMakeProjectTarget)
-target_link_libraries(examplet2kdataframe T2KDataSource ${MakeProjectLib} ${ROOT_LIBRARIES} )
+target_link_libraries(examplet2kdataframe T2KDataSource ${ROOT_LIBRARIES} )
 
 set(EXAMPLE_SCRIPTS example.py)
 
