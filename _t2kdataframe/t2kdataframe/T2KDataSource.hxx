@@ -21,6 +21,49 @@ using namespace std;
 
 namespace T2K {
 
+    class RooVtxWrapper {
+    private:
+        ND::RooTrackerVtxBase* ptr;
+        ND::GRooTrackerVtx* genie;
+        ND::NRooTrackerVtx* neut;
+    public:
+    RooVtxWrapper(ND::RooTrackerVtxBase* vtx=0);
+    RooVtxWrapper(const RooVtxWrapper& cpy) = default;
+    ND::RooTrackerVtxBase* getptr();
+    TObjString* EvtCode();
+   int         EvtNum() const;
+   double      EvtXSec() const;
+   double      EvtDXSec() const;
+   double      EvtWght() const;
+   double      EvtProb() const;
+   double*      EvtVtx();
+   int         StdHepN() const;
+   Int_t      *StdHepPdg();
+   Int_t      *StdHepStatus();
+   double      (*StdHepX4())[4];
+   double      (*StdHepP4())[4];
+   double      (*StdHepPolz())[3];
+   Int_t      *StdHepFd();
+   Int_t      *StdHepLd();
+   Int_t      *StdHepFm();
+   Int_t      *StdHepLm();
+   int         G2NeutEvtCode() const;
+   TObjString* GeomPath();
+   TObjString* GeneratorName();
+   TObjString* OrigFileName();
+   TObjString* OrigTreeName();
+   int         OrigEvtNum() const;
+   int         OrigTreeEntries() const;
+   double      OrigTreePOT() const;
+   double      TimeInSpill() const;
+   int         TruthVertexID() const;
+
+   int NeutrinoPdg() const;
+   double NeutrinoEnergy() const;
+
+   static ROOT::VecOps::RVec<RooVtxWrapper> wrapclonesarray(const TClonesArray& arr);
+    };
+
     //Make some type aliases
     using Reco = ND::TGlobalReconModule::TGlobalPID;
     using RecoVec = ROOT::VecOps::RVec<Reco *>;
@@ -28,11 +71,8 @@ namespace T2K {
     using TruthTrajVec = ROOT::VecOps::RVec<TruthTraj *>;
     using TruthVtx = ND::TTruthVerticesModule::TTruthVertex;
     using TruthVtxVec = ROOT::VecOps::RVec<TruthVtx *>;
-#ifdef T2K_USE_GENIE
-    using TruthRooVtx = ND::GRooTrackerVtx;
-#else
-    using TruthRooVtx = ND::NRooTrackerVtx;
-#endif
+    using TruthRooVtx = RooVtxWrapper;
+
     using TruthRooVtxVec = ROOT::VecOps::RVec<TruthRooVtx *>;
 
     class T2KDataSource final : public ROOT::RDF::RDataSource {
@@ -177,14 +217,13 @@ namespace T2K {
                                                                                "HeaderDir/BasicDataQuality",
                                                                                "HeaderDir/BeamSummaryData",
                                                                                "ReconDir/Global",
-#ifdef T2K_USE_GENIE
                                                                                "TruthDir/GRooTrackerVtx",
-#else
-                                                 "TruthDir/NRooTrackerVtx",
-#endif
+                                                                               "TruthDir/NRooTrackerVtx",
                                                                                "TruthDir/Trajectories",
                                                                                "TruthDir/Vertices",
                                          },
-                                         BunchTiming bunchTiming = {});
+                                         BunchTiming bunchTiming = {},
+                                         bool truthisgenie = false
+                                         );
 }
 #endif

@@ -10,6 +10,53 @@
 
 namespace T2K {
 
+    RooVtxWrapper::RooVtxWrapper(ND::RooTrackerVtxBase* vtx) : ptr(vtx), genie(nullptr), neut(nullptr) {
+        if(vtx) {
+            genie = dynamic_cast<ND::GRooTrackerVtx *>(vtx);
+            neut = dynamic_cast<ND::NRooTrackerVtx *>(vtx);
+        }
+    }
+    ND::RooTrackerVtxBase* RooVtxWrapper::getptr() { return ptr;}
+    TObjString* RooVtxWrapper::EvtCode() { return genie?genie->EvtCode:neut->EvtCode; }
+    int         RooVtxWrapper::EvtNum() const { return genie?genie->EvtNum:neut->EvtNum; }
+    double      RooVtxWrapper::EvtXSec() const { return genie?genie->EvtXSec:neut->EvtXSec; }
+    double      RooVtxWrapper::EvtDXSec() const { return genie?genie->EvtDXSec:neut->EvtDXSec; }
+    double      RooVtxWrapper::EvtWght() const { return genie?genie->EvtWght:neut->EvtWght; }
+    double      RooVtxWrapper::EvtProb() const { return genie?genie->EvtProb:neut->EvtProb; }
+    double*      RooVtxWrapper::EvtVtx() { return genie?genie->EvtVtx:neut->EvtVtx; }
+    int         RooVtxWrapper::StdHepN() const { return genie?genie->StdHepN:neut->StdHepN; }
+    Int_t      *RooVtxWrapper::StdHepPdg() { return genie?genie->StdHepPdg:neut->StdHepPdg; }
+    Int_t      *RooVtxWrapper::StdHepStatus() { return genie?genie->StdHepStatus:neut->StdHepStatus; }
+    double     (*RooVtxWrapper::StdHepX4())[4] { return genie?genie->StdHepX4:neut->StdHepX4; }
+    double     (*RooVtxWrapper::StdHepP4())[4] { return genie?genie->StdHepP4:neut->StdHepP4; }
+    double     (*RooVtxWrapper::StdHepPolz())[3] { return genie?genie->StdHepPolz:neut->StdHepPolz; }
+    Int_t      *RooVtxWrapper::StdHepFd() { return genie?genie->StdHepFd:neut->StdHepFd; }
+    Int_t      *RooVtxWrapper::StdHepLd() { return genie?genie->StdHepLd:neut->StdHepLd; }
+    Int_t      *RooVtxWrapper::StdHepFm() { return genie?genie->StdHepFm:neut->StdHepFm; }
+    Int_t      *RooVtxWrapper::StdHepLm() { return genie?genie->StdHepLm:neut->StdHepLm; }
+    int         RooVtxWrapper::G2NeutEvtCode() const { return genie?genie->G2NeutEvtCode:neut->EvtCode->GetString().Atoi(); }
+    TObjString* RooVtxWrapper::GeomPath() { return genie?genie->GeomPath:neut->GeomPath; }
+    TObjString* RooVtxWrapper::GeneratorName() { return genie?genie->GeneratorName:neut->GeneratorName; }
+    TObjString* RooVtxWrapper::OrigFileName() { return genie?genie->OrigFileName:neut->OrigFileName; }
+    TObjString* RooVtxWrapper::OrigTreeName() { return genie?genie->OrigTreeName:neut->OrigTreeName; }
+    int         RooVtxWrapper::OrigEvtNum() const { return genie?genie->OrigEvtNum:neut->OrigEvtNum; }
+    int         RooVtxWrapper::OrigTreeEntries() const { return genie?genie->OrigTreeEntries:neut->OrigTreeEntries; }
+    double      RooVtxWrapper::OrigTreePOT() const { return genie?genie->OrigTreePOT:neut->OrigTreePOT; }
+    double      RooVtxWrapper::TimeInSpill() const { return genie?genie->TimeInSpill:neut->TimeInSpill; }
+    int         RooVtxWrapper::TruthVertexID() const { return genie?genie->TruthVertexID:neut->TruthVertexID; }
+    int RooVtxWrapper::NeutrinoPdg() const { return genie?genie->StdHepPdg[0]:neut->StdHepPdg[0]; }
+    double RooVtxWrapper::NeutrinoEnergy() const { return genie?genie->StdHepP4[0][3]:neut->StdHepP4[0][3]; }
+
+    ROOT::VecOps::RVec<RooVtxWrapper> RooVtxWrapper::wrapclonesarray(const TClonesArray& arr) {
+        ROOT::VecOps::RVec<RooVtxWrapper> v;
+        for (int i = 0; i < arr.GetEntries(); ++i) {
+            TObject *obj = arr.At(i);
+            ND::RooTrackerVtxBase* newobj = dynamic_cast<ND::RooTrackerVtxBase*>(obj);
+            v.emplace_back(RooVtxWrapper(newobj));
+        }
+        return std::move(v);
+    }
+
     std::vector<void *> T2KDataSource::T2KSingleRootChainDS::GetColumnReadersImpl(std::string_view name, const std::type_info &id) {
         const auto colTypeName = GetTypeName(name);
         const auto &colTypeId = ROOT::Internal::RDF::TypeName2TypeID(colTypeName);
@@ -165,7 +212,9 @@ namespace T2K {
     T2KDataFrameWrapper MakeT2KDataFrame(std::vector<std::string> fileNameGlob,
                                          bool enabletruth,
                                          std::vector<std::string> treeNames,
-                                         BunchTiming bunchTiming) {
+                                         BunchTiming bunchTiming,
+                                         bool truthisgenie
+                                         ) {
         if(!enabletruth) {
             // Remove truth trees
             std::vector<std::string> t;
@@ -192,20 +241,20 @@ namespace T2K {
                 .Define("t2kisnewfile", [datasourceptr, nbunches](unsigned int slot, ULong64_t entry, int t2kbunch) { return datasourceptr->GetSlotChain(slot, 0).GetChainEntryNumber(0)==(entry/nbunches) && t2kbunch==0; }, {"tdfslot_", "tdfentry_", "t2kbunch"} );
         if(enabletruth) {
             //Add Truth vertices
-            reco =
-#ifdef T2K_USE_GENIE
-                    reco.Define("t2kroovtx", T2K::tcatorvec<ND::GRooTrackerVtx*>, {"GRooTrackerVtx_Vtx"})
-#else
-                                    reco.Define("t2kroovtx", T2K::tcatorvec<ND::GRooTrackerVtx*>, {"NRooTrackerVtx_Vtx"})
-#endif
-                            .Define("t2ktruthtraj", T2K::tcatorvec<TruthTraj*>, {"Trajectories_Trajectories"})
-                            .Define("t2ktruthvtx", T2K::tcatorvec<TruthVtx*>, {"Vertices_Vertices"});
+            if (truthisgenie) {
+                reco = reco.Define("t2kroovtx", T2K::RooVtxWrapper::wrapclonesarray, {"GRooTrackerVtx_Vtx"});
+            } else {
+                reco = reco.Define("t2kroovtx", T2K::RooVtxWrapper::wrapclonesarray, {"NRooTrackerVtx_Vtx"});
+            }
+            reco = reco.Define("t2ktruthtraj", T2K::tcatorvec<TruthTraj*>, {"Trajectories_Trajectories"})
+                    .Define("t2ktruthvtx", T2K::tcatorvec<TruthVtx*>, {"Vertices_Vertices"});
         }
         else {
             // No truth, fill with empty containers
             reco = reco.Define("t2kroovtx", [](){ return T2K::TruthRooVtxVec(); }, {})
                     .Define("t2ktruthtraj", []() { return T2K::TruthTrajVec(); }, {})
-                    .Define("t2ktruthvtx", []() { return T2K::TruthVtxVec(); }, {});
+                    .Define("t2ktruthvtx", []() { return T2K::TruthVtxVec(); }, {})
+                    ;
         }
         // Wrap and return result
         return T2KDataFrameWrapper(std::move(tdf), std::move(reco));
