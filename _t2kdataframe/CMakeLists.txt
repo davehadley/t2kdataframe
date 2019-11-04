@@ -22,8 +22,8 @@ include(${ROOT_USE_FILE})
 # Try to find a file to do make project with
 set(MAKE_PROJECT_FILE_NAME "oaanalysisfile.root" CACHE FILEPATH "Path to oaAnalysis file used to by TFile::MakeProject.")
 if(NOT EXISTS ${MAKE_PROJECT_FILE_NAME})
-    # message(FATAL_ERROR "ERROR: unable to find file to run TFile::MakeProject. Set this with -D MAKE_PROJECT_FILE_NAME=<filename.root>")
-    set(MAKE_PROJECT_FILE_NAME "/storage/epp2/t2k/data/nd280/production006/B/mcp/genie/2010-11-air/magnet/run4/anal/oa_gn_beam_91400000-0002_fdbfaupp6ljn_anal_000_prod006magnet201011airc-bsdv01_2.root")
+    message(FATAL_ERROR "ERROR: unable to find file to run TFile::MakeProject. Set this with -D MAKE_PROJECT_FILE_NAME=<filename.root>")
+    #set(MAKE_PROJECT_FILE_NAME "/storage/epp2/t2k/data/nd280/production006/B/mcp/genie/2010-11-air/magnet/run4/anal/oa_gn_beam_91400000-0002_fdbfaupp6ljn_anal_000_prod006magnet201011airc-bsdv01_2.root")
 endif()
 message(STATUS "using MAKE_PROJECT_FILE_NAME=${MAKE_PROJECT_FILE_NAME}")
 
