@@ -28,13 +28,13 @@ endif()
 message(STATUS "using MAKE_PROJECT_FILE_NAME=${MAKE_PROJECT_FILE_NAME}")
 
 # Run ROOT's TFile::MakeProject
-set(MakeProjectLib ${T2KDATAFRAME_BINARY_DIR}/libT2KDataFrameMakeProject/libT2KDataFrameMakeProjectProjectSource.o)
+set(MakeProjectObj ${T2KDATAFRAME_BINARY_DIR}/libT2KDataFrameMakeProject/libT2KDataFrameMakeProjectProjectSource.o)
 add_custom_command(
-        OUTPUT ${MakeProjectLib}
+        OUTPUT ${MakeProjectObj}
         COMMAND $ENV{ROOTSYS}/bin/root -l -q ${MAKE_PROJECT_FILE_NAME} ${T2KDATAFRAME_SOURCE_DIR}/t2kdataframe/buildmakeproject.C
         DEPENDS ${MAKE_PROJECT_FILE_NAME}
 )
-add_custom_target(CustomMakeProjectTarget DEPENDS ${MakeProjectLib})
+add_custom_target(CustomMakeProjectTarget DEPENDS ${MakeProjectObj})
 
 # Ensure all directories are accessible
 include_directories( ${T2KDATAFRAME_BINARY_DIR})
@@ -47,7 +47,7 @@ add_dependencies(T2KDataFrameDict CustomMakeProjectTarget)
 add_library(T2KDataSource SHARED t2kdataframe/T2KDataSource.cxx T2KDataFrameDict.cxx)
 add_dependencies(T2KDataSource CustomMakeProjectTarget)
 add_dependencies(T2KDataSource T2KDataFrameDict)
-target_link_libraries(T2KDataSource ${MakeProjectLib} ${ROOT_LIBRARIES})
+target_link_libraries(T2KDataSource ${MakeProjectObj} ${ROOT_LIBRARIES})
 
 # Compile the main executable
 add_executable(examplet2kdataframe t2kdataframe/example.cxx)
@@ -65,11 +65,6 @@ foreach(_script ${EXAMPLE_SCRIPTS})
 endforeach()
 
 # Copy results to installation directory
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameMakeProject/libT2KDataFrameMakeProjectProjectDict_rdict.pcm DESTINATION pyt2k)
-install (FILES ${MakeProjectLib} DESTINATION pyt2k)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameDict_rdict.pcm DESTINATION pyt2k)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameDict.rootmap DESTINATION pyt2k)
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libT2KDataFrameMakeProject.so DESTINATION pyt2k)
 install (TARGETS T2KDataSource DESTINATION pyt2k)
 install (TARGETS examplet2kdataframe DESTINATION bin)
 install (FILES t2kdataframe/T2KDataSource.hxx DESTINATION include/t2kdataframe)
