@@ -4,6 +4,22 @@ from argparse import ArgumentParser
 from glob import glob
 import os
 
+_CPPCODE = '''
+    bool positioninfiducialvolume(const TLorentzVector &pos) {
+    auto x = pos.X();
+    auto y = pos.Y();
+    auto z = pos.Z();
+    return (abs(x) < 874.51
+            && abs(y - 55.) < 874.51
+            && 136.875 < z && z < 447.375);
+}
+
+    bool infiducialvolume(T2K::Reco *reco) {
+        auto &pos = reco->FrontPosition;
+    return positioninfiducialvolume(pos);
+    }
+'''
+
 def parsecml():
     parser = ArgumentParser()
     parser.add_argument("filelist", nargs="+", help="List of input files.", type=str)
@@ -25,10 +41,8 @@ def listoftrees():
     "HeaderDir/BeamSummaryData",
     "ReconDir/Global",
     "TruthDir/GRooTrackerVtx",
-    #"TruthDir/NRooTrackerVtx",
     "TruthDir/Trajectories",
     "TruthDir/Vertices"]
-
 
 def main():
     args = parsecml()
@@ -37,8 +51,13 @@ def main():
                                    True,
                                    tostdvector(listoftrees()),
                                    ROOT.T2K.BunchTiming(),
-                                   True,
                                    )
+    ROOT.gInterpreter.Declare(_CPPCODE)
+    anal = (df.Define("tracks_in_fv", "return ROOT::VecOps::Sort(Filter(t2kreco, infiducialvolume), [](T2K::Reco *lhs, T2K::Reco *rhs) -> bool { return lhs->FrontMomentum > rhs->FrontMomentum; });")
+            .Filter("tracks_in_fv.size()>0")
+            .Define("leading_track_momentum", "tracks_in_fv.at(0)->FrontMomentum")
+            )
+    anal.Snapshot("exntuple", "exntuple.root", tostdvector(["leading_track_momentum"]))
     return
 
 if __name__ == "__main__":
